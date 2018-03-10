@@ -1,0 +1,70 @@
+/* tslint:disable */
+import * as DataLoader from 'dataloader';
+import * as dataLoaderCacheLru from 'dataloader-cache-lru';
+import * as ms from 'millisecond';
+{{#each types }}
+{{#ifDirective this "cacheControl" }}
+import { {{ name }}Model } from '../{{ name }}Model';
+{{/ifDirective}}
+{{/each}}
+
+{{#each types }}
+{{#ifDirective this "cacheControl" }}
+export const {{toCamelCase name}}ByIdLoader = new DataLoader<number, {{ name }}Model>(
+  (ids: number[]) => {{ name }}Model.findByKeys<{{ name }}Model>('id', ids, {{ name }}Model)
+    .then((models: {{ name }}Model[]) => {
+      models = models.map((model) => {
+        return model.toJSON();
+      });
+      for (let model of models) {
+      {{#each fields}}
+        {{#ifDirective this "cacheControl" }}
+        {{ toCamelCase ../../name }}By{{ toCamelCase name }}Loader.prime(model.{{ name }}, model);
+        {{/ifDirective}}
+      {{/each}}
+      }
+
+      return ids.map(id => models.find(x => x.id === id));
+    }),
+  {
+    cacheMap: dataLoaderCacheLru({ {{#if maxAge}}maxAge: ms('{{maxAge}}'){{/if}}{{#ifCond maxAge "&&" maxItems}}, {{/ifCond}}{{#if maxItems}}max: {{maxItems}}{{/if}} })
+  }
+);
+//exports.{{toCamelCase name}}ByIdLoader = () => {
+//  return {{toCamelCase name}}ByIdLoader;
+//};
+
+{{/ifDirective}}
+{{#each fields}}
+  {{#ifDirective this "cacheControl" }}
+export const {{toCamelCase ../../name}}By{{ toCamelCase name }}Loader = new DataLoader<{{ toPrimitive type }}, {{ ../../name }}Model>(
+  (ids: {{ toPrimitive type }}[]) => {{ ../../name }}Model.findByKeys<{{ ../../name }}Model>('{{ ../name }}', ids, {{ ../../name }}Model)
+    .then((models: {{ ../../name }}Model[]) => {
+      models = models.map((model) => {
+        return model.toJSON();
+      });
+      for (let model of models) {
+      {{#ifDirective ../../this "cacheControl" }}
+        {{ toCamelCase ../../../name }}ByIdLoader.prime(model.id, model);
+      {{/ifDirective}}
+      {{#each ../../fields}}
+      {{#ifDirective this "cacheControl" }}
+        {{#ifCond ../name "!==" ../../../name}}
+        {{ toCamelCase ../../../../name }}By{{ toCamelCase ../name }}Loader.prime(model.{{ ../name }}, model);
+        {{/ifCond}}
+      {{/ifDirective}}
+      {{/each}}
+      }
+      return ids.map(id => models.find(x => x.{{ ../name }} === id));
+    }),
+  {
+    cacheMap: dataLoaderCacheLru({ {{#if maxAge}}maxAge: ms('{{maxAge}}'){{/if}}{{#ifCond maxAge "&&" maxItems}}, {{/ifCond}}{{#if maxItems}}max: {{maxItems}}{{/if}} })
+  }
+);
+//exports.{{toCamelCase ../../name}}By{{ toCamelCase name }}Loader = () => {
+//  return {{toCamelCase ../../name}}By{{ toCamelCase name }}Loader;
+//};
+
+  {{/ifDirective}}
+{{/each}}
+{{/each}}

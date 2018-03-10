@@ -1,0 +1,121 @@
+/* tslint:disable */
+{{#ifDirective this "entity" }}
+import {BelongsTo, Column, IsUUID, PrimaryKey, HasMany, BelongsToMany} from 'sequelize-typescript';
+import {IdEntityModel, ILoaders} from '../core/IdEntityModel';
+import * as DataLoader from 'dataloader';
+import { {{ name }}Model } from '../{{ name }}Model';
+  {{#eachImport this }}
+import { {{ name }}Model } from '../{{ name }}Model';
+  {{/eachImport}}
+  {{#each fields}}
+  {{#ifBelongsToMany this ../../name }}
+import { {{ through }}Model } from '../{{ through }}Model';
+    {{/ifBelongsToMany}}
+  {{/each}}
+{{/ifDirective}}
+
+{{#eachImport this }}
+import { {{ name }} } from './{{ file }}';
+{{/eachImport}}
+{{#ifDirective this "cacheControl" }}
+import { {{toCamelCase name}}ByIdLoader } from './loaders';
+{{/ifDirective}}
+{{#each fields}}
+{{#ifDirective this "cacheControl" }}
+import { {{ toCamelCase ../../name }}By{{ toCamelCase name }}Loader } from './loaders';
+{{/ifDirective}}
+{{/each}}
+
+{{ toComment description }}
+export interface {{ name }}{{#if hasInterfaces}} extends {{#each interfaces}}{{this}}{{#unless @last}},{{/unless}}{{/each}}{{/if}} {
+{{#each fields}}
+  {{#if description}}
+  {{ toComment description }}
+  {{/if}}
+  {{ name }}{{#unless isRequired}}?{{/unless}}: {{ toPrimitive type }}{{#if isArray}}[]{{/if}};
+{{/each}}
+}
+
+{{#each fields}}
+{{~# if hasArguments }}
+export interface {{ toPascalCase name }}{{ toPascalCase ../name }}Args {
+{{#each arguments}}
+  {{ name }}{{#unless isRequired}}?{{/unless}}: {{ toPrimitive type }}{{#if isArray}}[]{{/if}}{{#unless isRequired}} | null{{/unless}}; {{ toComment description }}
+{{/each}}
+}
+{{/if}}
+{{/each}}
+
+{{#ifDirective this "entity"}}
+const loader: ILoaders<DataLoader<number | string, {{name}}Model>>[] = [];
+{{#ifDirective this "cacheControl" }}
+loader.push({ id: {{toCamelCase name}}ByIdLoader });
+{{/ifDirective}}
+{{#each fields}}
+{{#ifDirective this "cacheControl" }}
+loader.push({ '{{ name }}': {{ toCamelCase ../../name }}By{{ toCamelCase name }}Loader });
+{{/ifDirective}}
+{{/each}}
+
+export class {{name}}DB<T> extends IdEntityModel<T> {
+
+  static loader: ILoaders<DataLoader<number | string, {{name}}Model>>[] = loader;
+
+{{#each fields}}
+{{#ifDirective this "UUID"}}
+  @IsUUID(4)
+  @PrimaryKey
+  @Column
+  public {{ ../name }}: string;
+
+{{/ifDirective}}
+{{#ifDirective this "Column"}}
+{{#if dataType}}
+  @Column({{dataType}})
+  public {{ ../name }}: {{ toPrimitive ../type }};
+{{else}}
+  @Column
+  public {{ ../name }}: {{ toPrimitive ../type }};
+{{/if}}
+
+{{/ifDirective}}
+{{#ifDirective this "BelongsTo"}}
+  @Column
+  public {{#if foreignKey}}{{foreignKey}}{{else}}{{ ../name }}Id{{/if}}: number;
+
+  @BelongsTo(() => {{ ../type }}Model, '{{#if foreignKey}}{{foreignKey}}{{else}}{{ ../name }}Id{{/if}}')
+  public {{ ../name }}: {{ ../type }}Model;
+
+{{/ifDirective}}
+{{#ifDirective this "HasMany"}}
+  @BelongsTo(() => {{ ../type }}Model, '{{foreignKey}}')
+  public {{ ../name }}: {{ ../type }}Model;
+
+{{/ifDirective}}
+{{#ifBelongsToMany this ../../name }}
+  @BelongsToMany(() => {{ ../type }}Model, () => {{ through }}Model, '{{foreignKey}}', '{{otherKey}}')
+  public {{ ../name }}: {{ ../type }}Model[];
+{{/ifBelongsToMany}}
+{{/each}}
+}
+{{#each fields}}
+  {{#getRelations this ../../name }}
+
+export class {{through}}DB<T> extends IdEntityModel<T> {
+  @PrimaryKey
+  @Column
+  public {{foreignKey}}: number;
+
+  @BelongsTo(() => {{ tableName }}Model, '{{foreignKey}}')
+  public {{ toCamelCase tableName }}: {{ tableName }}Model;
+
+  @PrimaryKey
+  @Column
+  public {{otherKey}}: number;
+
+  @BelongsTo(() => {{ relatedModelGetter }}Model, '{{otherKey}}')
+  public {{ toCamelCase relatedModelGetter }}: {{ relatedModelGetter }}Model;
+}
+  {{/getRelations}}
+{{/each}}
+{{/ifDirective}}

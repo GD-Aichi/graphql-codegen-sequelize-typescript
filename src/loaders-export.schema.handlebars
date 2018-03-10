@@ -1,0 +1,28 @@
+/* tslint:disable */
+{{#each types }}
+  {{#ifDirective this "cacheControl" }}
+import { {{toCamelCase name}}ByIdLoader as {{toCamelCase name}}ByIdLoaderImport } from './loaders';
+  {{/ifDirective}}
+  {{#each fields}}
+    {{#ifDirective this "cacheControl" }}
+import { {{toCamelCase ../../name}}By{{ toCamelCase name }}Loader as {{toCamelCase ../../name}}By{{ toCamelCase name }}LoaderImport } from './loaders';
+    {{/ifDirective}}
+  {{/each}}
+{{/each}}
+
+{{#each types }}
+  {{#ifDirective this "cacheControl" }}
+export const {{toCamelCase name}}ByIdLoader = () => {
+  return {{toCamelCase name}}ByIdLoaderImport;
+};
+
+  {{/ifDirective}}
+  {{#each fields}}
+    {{#ifDirective this "cacheControl" }}
+export const {{toCamelCase ../../name}}By{{ toCamelCase name }}Loader = () => {
+  return {{toCamelCase ../../name}}By{{ toCamelCase name }}LoaderImport;
+};
+
+    {{/ifDirective}}
+  {{/each}}
+{{/each}}
