@@ -24,6 +24,13 @@ const config = {
   },
   flattenTypes: true,
   filesExtension: 'ts',
+  primitives: {
+    String: 'string',
+    Int: 'number',
+    Float: 'number',
+    Boolean: 'boolean',
+    ID: 'string'
+  },
   customHelpers: {
     ifBelongsToMany: (context, tableName, options) => {
       if (
