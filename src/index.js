@@ -7,6 +7,7 @@ const inputType = fs.readFileSync(__dirname + '/type.handlebars', 'utf8');
 const scalar = fs.readFileSync(__dirname + '/scalar.handlebars', 'utf8');
 const loaders = fs.readFileSync(__dirname + '/loaders.schema.handlebars', 'utf8');
 const loadersExport = fs.readFileSync(__dirname + '/loaders-export.schema.handlebars', 'utf8');
+const union = fs.readFileSync(__dirname + '/union.handlebars', 'utf8');
 
 const toMany = {};
 const config = {
@@ -17,6 +18,7 @@ const config = {
     interface: interfaceTemplate,
     enum: enumTemplate,
     scalar,
+    union,
     'loaders.ts.schema.handlebars': loaders,
     'loaders-export.ts.schema.handlebars': loadersExport
   },
