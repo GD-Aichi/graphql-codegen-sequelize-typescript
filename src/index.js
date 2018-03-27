@@ -1,9 +1,9 @@
 const fs = require('fs');
 
 const enumTemplate = fs.readFileSync(__dirname + '/enum.handlebars', 'utf8');
-const type = fs.readFileSync(__dirname + '/inputType.handlebars', 'utf8');
+const type = fs.readFileSync(__dirname + '/type.handlebars', 'utf8');
 const interfaceTemplate = fs.readFileSync(__dirname + '/interface.handlebars', 'utf8');
-const inputType = fs.readFileSync(__dirname + '/type.handlebars', 'utf8');
+const inputType = fs.readFileSync(__dirname + '/inputType.handlebars', 'utf8');
 const scalar = fs.readFileSync(__dirname + '/scalar.handlebars', 'utf8');
 const loaders = fs.readFileSync(__dirname + '/loaders.schema.handlebars', 'utf8');
 const loadersExport = fs.readFileSync(__dirname + '/loaders-export.schema.handlebars', 'utf8');
