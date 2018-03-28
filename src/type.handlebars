@@ -1,6 +1,6 @@
 /* tslint:disable */
 {{#ifDirective this "entity" }}
-import {BelongsTo, Column, IsUUID, PrimaryKey, HasMany, BelongsToMany} from 'sequelize-typescript';
+import {Model, BelongsTo, Column, IsUUID, PrimaryKey, HasMany, BelongsToMany} from 'sequelize-typescript';
 import {IdEntityModel, ILoaders} from '../core/IdEntityModel';
 import * as DataLoader from 'dataloader';
 import { {{ name }}Model } from '../{{ toCamelCase name }}.type';
@@ -57,7 +57,7 @@ loader.push({ '{{ name }}': {{ toCamelCase ../../name }}By{{ toCamelCase name }}
 {{/ifDirective}}
 {{/each}}
 
-export class {{name}}DB<T> extends IdEntityModel<T> {
+export class {{name}}DB<T extends Model<T>> extends IdEntityModel<T> {
 
   static loader: ILoaders<DataLoader<number | string, {{name}}Model>>[] = loader;
 
