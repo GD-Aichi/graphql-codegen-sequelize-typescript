@@ -3,13 +3,13 @@
 import {BelongsTo, Column, IsUUID, PrimaryKey, HasMany, BelongsToMany} from 'sequelize-typescript';
 import {IdEntityModel, ILoaders} from '../core/IdEntityModel';
 import * as DataLoader from 'dataloader';
-import { {{ name }}Model } from '../{{ name }}Model';
+import { {{ name }}Model } from '../{{ toCamelCase name }}.type';
   {{#eachImport this }}
-import { {{ name }}Model } from '../{{ name }}Model';
+import { {{ name }}Model } from '../{{ toCamelCase name }}.type';
   {{/eachImport}}
   {{#each fields}}
   {{#ifBelongsToMany this ../../name }}
-import { {{ through }}Model } from '../{{ through }}Model';
+import { {{ through }}Model } from '../{{ toCamelCase through }}.type';
     {{/ifBelongsToMany}}
   {{/each}}
 {{/ifDirective}}
