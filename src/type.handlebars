@@ -4,13 +4,13 @@ import {Model, BelongsTo, Column, IsUUID, PrimaryKey, HasMany, BelongsToMany} fr
 import {IdEntityModel, ILoaders} from '../core/IdEntityModel';
 import * as DataLoader from 'dataloader';
 import { {{ name }}Model } from '../{{ toCamelCase name }}.type';
-  {{#eachImport this }}
+  {{#eachModel this }}
 import { {{ name }}Model } from '../{{ toCamelCase name }}.type';
-  {{/eachImport}}
+  {{/eachModel}}
   {{#each fields}}
   {{#ifBelongsToMany this ../../name }}
 import { {{ through }}Model } from '../{{ toCamelCase through }}.type';
-    {{/ifBelongsToMany}}
+  {{/ifBelongsToMany}}
   {{/each}}
 {{/ifDirective}}
 

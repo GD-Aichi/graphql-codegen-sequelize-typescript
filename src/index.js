@@ -41,7 +41,10 @@ const config = {
         const element = context.directives['BelongsToMany'];
         const through = element.through;
 
-        const data = { through, relatedModelGetter: context.type };
+        const data = {
+          through,
+          relatedModelGetter: context.type
+        };
         // not item in list
         if (!toMany[element.through] || toMany[element.through].tableName === tableName) {
           const foreignKey = element.foreignKey || tableName.toLowerCase() + 'Id';
@@ -63,7 +66,9 @@ const config = {
           data.foreignKey = foreignKey;
           data.otherKey = otherKey;
         }
-        return options && options.fn ? options.fn({ ...data, ...context }) : '';
+        return options && options.fn ? options.fn({ ...data,
+          ...context
+        }) : '';
       }
 
       return options && options.inverse ? options.inverse(context) : '';
@@ -74,11 +79,52 @@ const config = {
           const through = context.directives['BelongsToMany'].through;
 
           if (toMany[through] && toMany[through].tableName === tableName) {
-            return options && options.fn ? options.fn({ ...toMany[through], ...context }) : '';
+            return options && options.fn ? options.fn({ ...toMany[through],
+              ...context
+            }) : '';
           }
         }
       }
       return options && options.inverse ? options.inverse(context) : '';
+    },
+    eachModel: (context, options) => {
+      let ret = '';
+      const imports = [];
+      if (context.fields && !context.onType && !context.operationType) {
+        context.fields.forEach((field) => {
+
+          if (!config.primitives[field.type]) {
+            if (field.type === context.name) {
+              return;
+            }
+
+            if (field.isType) {
+              const file = sanitizeFilename(field.type, 'type');
+
+              if (!imports.find(t => t.name === field.type)) {
+                imports.push({
+                  name: field.type,
+                  file,
+                  type: 'type'
+                });
+              }
+            }
+          }
+
+        });
+      }
+
+      for (let i = 0, j = imports.length; i < j; i++) {
+        ret =
+          ret +
+          options.fn(imports[i], {
+            data: {
+              withExtension: imports[i] + '.' + config.filesExtension
+            }
+          });
+      }
+
+      return ret;
     }
   }
 };
