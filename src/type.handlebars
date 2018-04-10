@@ -1,6 +1,6 @@
 /* tslint:disable */
 {{#ifDirective this "entity" }}
-import {Model, BelongsTo, Column, IsUUID, PrimaryKey, HasMany, BelongsToMany} from 'sequelize-typescript';
+import {Model, BelongsTo, Column, IsUUID, PrimaryKey, HasMany, BelongsToMany, DataType} from 'sequelize-typescript';
 import {IdEntityModel, ILoaders} from '../core/IdEntityModel';
 import * as DataLoader from 'dataloader';
 import { {{ name }}Model } from '../{{ toCamelCase name }}.type';
@@ -71,7 +71,7 @@ export class {{name}}DB<T extends Model<T>> extends IdEntityModel<T> {
 {{/ifDirective}}
 {{#ifDirective this "Column"}}
 {{#if dataType}}
-  @Column({{dataType}})
+  @Column(DataType.{{dataType}})
   public {{ ../name }}: {{ toPrimitive ../type }};
 {{else}}
   @Column
