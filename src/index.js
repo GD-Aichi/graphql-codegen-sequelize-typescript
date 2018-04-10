@@ -9,6 +9,12 @@ const loaders = fs.readFileSync(__dirname + '/loaders.schema.handlebars', 'utf8'
 const loadersExport = fs.readFileSync(__dirname + '/loaders-export.schema.handlebars', 'utf8');
 const union = fs.readFileSync(__dirname + '/union.handlebars', 'utf8');
 
+function sanitizeFilename(name, graphQlType) {
+  const cleanName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+  return cleanName === '' ? cleanName : cleanName + '.' + graphQlType;
+}
+
 const toMany = {};
 const config = {
   inputType: 'MULTIPLE_FILES',
